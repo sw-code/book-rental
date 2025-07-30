@@ -19,20 +19,24 @@ fun start(){
 
 	bookInfos()
 
-	callReturnBook()
-
-	bookInfos()
+	library.calculateFeeFromUser(1)
 
 	callReturnBook()
 
 	bookInfos()
+
+	callReturnBook()
+
+	bookInfos()
+
+	library.calculateFeeFromUser(1)
 }
 
 
 fun callRentBook(){
 	val i = gainInput("input bookId to rent a book: ")
 	if (i != -1) {
-		library.rentBook(i)
+		library.rentBook(i, 1)
 	}
 }
 
