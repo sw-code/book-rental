@@ -9,11 +9,11 @@ class Library(
 
     fun rentBook(idInput: Int): Boolean{  // returns true if the rental was successful otherwise false
 
-        val indexOfBook = findBookInList(currentBooks) {it.id == idInput}
+        if(books.any{ it.id == idInput }){
 
-        if(indexOfBook != -1){
+            val indexOfBook = currentBooks.indexOfFirst { it.id == idInput }
 
-            if(findBookInList(currentBooks){it == currentBooks[indexOfBook]} != -1){
+            if(indexOfBook != -1){
 
                 rental.add(Rental(idInput, 1))
                 rental[rental.size - 1].info()
@@ -27,7 +27,7 @@ class Library(
             }
         }
         else{
-            println("index out of bounds, the submitted index is out of range of the currently Available books")
+            println("index out of bounds, the submitted index is out of range of the Available books")
         }
         return false
     }
@@ -39,6 +39,22 @@ class Library(
             }
         }
         return -1
+    }
+
+
+
+
+
+    fun returnBook(bookId: Int):Boolean{
+        val indexOfBook = findBookInList(books) {it.id == bookId}
+
+        currentBooks.add(books[indexOfBook])
+
+        val indexOfRental = findBookInList(rental) {it.bookId == bookId}
+
+        rental.removeAt(indexOfRental)
+
+        return true
     }
 
 

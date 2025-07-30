@@ -11,15 +11,15 @@ fun main(args: Array<String>) {
 fun start(){
 	bookInfos()
 
-	callRentBook()
+	callRentBook(){library.rentBook(1)}
 
 	bookInfos()
 
-	callRentBook()
+	callRentBook(){library.rentBook(1)}
 }
 
 
-fun callRentBook(){
+fun callRentBook(match: (Int) ->  Boolean){
 	val i = gainInput()
 	if (i != -1) {
 		library.rentBook(i)
