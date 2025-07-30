@@ -1,19 +1,32 @@
 package com.example.spring_boot
 
-class Library {
-    val books = listOf<Book>(Book("Kotlin in action", 1), Book("Jamie Oliver", 2))
-    var rental =listOf<Rental>()
+class Library(
+    val books: List<Book>,
+    var currentBooks: MutableList<Book>
+) {
 
-    fun start(){
-        displayAllBookTitles()
-    }
+    var rental = mutableListOf<Rental>()
 
-    fun displayAllBookTitles(){
-        for(i in 0..books.size){
-            books[]
+    fun rentBook(idInput: Int): Boolean{  // returns true if the rental was successful otherwise false
+        if(idInput > 0 && idInput <= books.size){
+            if(currentBooks.contains(books[idInput])){
+
+                rental.add(Rental(idInput, 1))
+                rental[rental.size - 1].info()
+
+                currentBooks.removeAt(idInput)
+
+                return true
+            }
+            else{
+                println("book is already rented")
+            }
         }
+        else{
+            println("index out of bounds, the submitted index is out of range")
+        }
+        return false
     }
-
 
 
 }
