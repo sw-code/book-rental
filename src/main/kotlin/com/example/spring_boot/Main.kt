@@ -11,18 +11,35 @@ fun main(args: Array<String>) {
 fun start(){
 	bookInfos()
 
-	callRentBook(){library.rentBook(1)}
+	callRentBook()
 
 	bookInfos()
 
-	callRentBook(){library.rentBook(1)}
+	callRentBook()
+
+	bookInfos()
+
+	callReturnBook()
+
+	bookInfos()
+
+	callReturnBook()
+
+	bookInfos()
 }
 
 
-fun callRentBook(match: (Int) ->  Boolean){
-	val i = gainInput()
+fun callRentBook(){
+	val i = gainInput("input bookId to rent a book: ")
 	if (i != -1) {
 		library.rentBook(i)
+	}
+}
+
+fun callReturnBook(){
+	val i = gainInput("input bookId to return your book: ")
+	if (i != -1) {
+		library.returnBook(i)
 	}
 }
 
@@ -43,8 +60,8 @@ fun displayBookTitles(toCheck: List<Book>, message: String){
 	}
 }
 
-fun gainInput(): Int{
-	print("input bookId to rent a book: ")
+fun gainInput(message: String): Int{
+	print(message)
 
 	val idInput: Int
 

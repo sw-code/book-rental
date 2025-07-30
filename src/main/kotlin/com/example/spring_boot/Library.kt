@@ -32,30 +32,34 @@ class Library(
         return false
     }
 
-    private fun <T> findBookInList(toCheckList: List<T>, match: (T) -> Boolean): Int {
-        for (i in 0..toCheckList.size - 1) {
-            if (match(toCheckList[i])) {
-                return i
+
+    fun returnBook(idInput: Int): Boolean{  // returns true if the rental was successful otherwise false
+
+        if(books.any{ it.id == idInput }){
+
+            val indexOfBook = currentBooks.indexOfFirst { it.id == idInput }
+
+            if(indexOfBook == -1){
+
+                val indexOfBook = books.indexOfFirst { it.id == idInput }
+
+                currentBooks.add(books[indexOfBook])
+
+                val indexOfRental = rental.indexOfFirst { it.bookId == idInput }
+
+                rental.removeAt(indexOfRental)
+
+                return true
+
+            }
+            else{
+                println("book is not rented yet")
             }
         }
-        return -1
+        else{
+            println("index out of bounds, the submitted index is out of range of the Available books")
+        }
+        return false
     }
-
-
-
-
-
-    fun returnBook(bookId: Int):Boolean{
-        val indexOfBook = findBookInList(books) {it.id == bookId}
-
-        currentBooks.add(books[indexOfBook])
-
-        val indexOfRental = findBookInList(rental) {it.bookId == bookId}
-
-        rental.removeAt(indexOfRental)
-
-        return true
-    }
-
 
 }

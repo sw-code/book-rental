@@ -3,6 +3,7 @@ package com.example.spring_boot
 import org.junit.jupiter.api.Assertions.*
 import java.time.LocalDate
 import kotlin.test.Test
+import kotlin.test.assertTrue
 
 class LibraryTest {
 
@@ -41,6 +42,69 @@ class LibraryTest {
         library.rentBook(pickedId)
         assertFalse(library.rentBook(pickedId))
     }
+
+
+    @Test
+    fun `the book id is out of bounds for renting`(){
+        val pickedId = 100
+
+        library.rentBook(pickedId)
+        assertFalse(library.rentBook(pickedId))
+    }
+
+
+
+    @Test
+    fun `should return a book`(){
+        val pickedId = 1
+
+        library.rentBook(pickedId)
+        assertTrue { library.returnBook(pickedId) }
+    }
+
+
+    @Test
+    fun `should return a book 2`(){
+        val pickedId = 10
+
+        library.rentBook(pickedId)
+        assertTrue { library.returnBook(pickedId) }
+    }
+
+
+    @Test
+    fun `should return the entire book collection`(){
+        library.rentBook(1)
+        library.rentBook(10)
+        library.rentBook(11)
+        library.rentBook(8)
+
+        library.returnBook(1)
+        library.returnBook(10)
+        library.returnBook(11)
+        assertTrue { library.returnBook(8) }
+    }
+
+
+    @Test
+    fun `the book is not rented`(){
+        val pickedId = 1
+
+        library.returnBook(pickedId)
+        assertFalse { library.returnBook(pickedId) }
+    }
+
+
+
+    @Test
+    fun `the book id is out of bounds for return`(){
+        val pickedId = 100
+
+        library.returnBook(pickedId)
+        assertFalse { library.returnBook(pickedId) }
+    }
+
+
 
 
 
