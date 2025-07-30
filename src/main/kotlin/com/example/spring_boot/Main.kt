@@ -1,9 +1,8 @@
 package com.example.spring_boot
 
-val books = listOf(Book("Kotlin in action", 1), Book("Jamie Oliver", 2))
-var currentBooks = books.toMutableList()
+private val books = listOf(Book("Kotlin in action", 1), Book("Jamie Oliver", 10))
 
-val library = Library(books, currentBooks)
+private val library = Library(books, books.toMutableList())
 
 fun main(args: Array<String>) {
 	start()
@@ -31,9 +30,9 @@ fun callRentBook(){
 
 fun bookInfos(){
 	println("--------------------------------------------------------------------")
-	displayBookTitles(books, "All books in our collection: ")
+	displayBookTitles(library.books, "All books in our collection: ")
 	println("-----------------")
-	displayBookTitles(currentBooks, "all currently available books: ")
+	displayBookTitles(library.currentBooks, "all currently available books: ")
 	println("-----------------")
 }
 
