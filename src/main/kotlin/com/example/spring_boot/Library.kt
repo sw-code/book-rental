@@ -29,7 +29,7 @@ class Library(
 
                 return rental
             } else {
-                throw BookNotAvailableException(idInput)
+                throw BookNotAvailableRentException(idInput)
             }
         } else {
             throw BookNotFoundException(idInput)
@@ -37,7 +37,7 @@ class Library(
     }
 
 
-    fun returnBook(idInput: Int): Boolean {  // returns true if the rental was successful otherwise false
+    fun returnBook(idInput: Int): Rental {  // returns true if the rental was successful otherwise false
 
         if (books.any { it.id == idInput }) {
 
@@ -53,16 +53,18 @@ class Library(
                 rentedBooks[indexOfRental].returnedDate = LocalDate.now()
                 reminderFeeCalculation(rentedBooks[indexOfRental], rentedBooks[indexOfRental].returnedDate!!)
 
+                val rental = rentedBooks[indexOfRental]
+
                 rentedBooks.removeAt(indexOfRental)
-                return true
+
+                return rental
 
             } else {
-                println("book is not rented yet")
+                throw BookNotAvailableReturnException(idInput)
             }
         } else {
-            println("index out of bounds, the submitted index is out of range of the Available books")
+            throw BookNotFoundException(idInput)
         }
-        return false
     }
 
 

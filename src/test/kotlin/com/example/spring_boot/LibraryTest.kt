@@ -1,6 +1,7 @@
 package com.example.spring_boot
 
 import org.junit.jupiter.api.Assertions.*
+import org.junit.jupiter.api.assertThrows
 import java.time.LocalDate
 import kotlin.test.Test
 import kotlin.test.assertTrue
@@ -16,14 +17,16 @@ class LibraryTest {
     fun `should rent a book`(){
         val pickedId = 1
 
-        assertTrue(library.rentBook(pickedId, 1))
+        val result = library.rentBook(pickedId, 1)
+        assertEquals(result::class.simpleName, "Rental")
     }
 
     @Test
     fun `should rent a book 2`(){
         val pickedId = 10
 
-        assertTrue(library.rentBook(pickedId, 1))
+        val result = library.rentBook(pickedId, 1)
+        assertEquals(result::class.simpleName, "Rental")
     }
 
     @Test
@@ -32,7 +35,8 @@ class LibraryTest {
         library.rentBook(10, 1)
         library.rentBook(11, 1)
 
-        assertTrue(library.rentBook(8, 1))
+        val result = library.rentBook(8, 1)
+        assertEquals(result::class.simpleName, "Rental")
     }
 
     @Test
@@ -40,7 +44,10 @@ class LibraryTest {
         val pickedId = 1
 
         library.rentBook(pickedId, 1)
-        assertFalse(library.rentBook(pickedId, 1))
+
+        assertThrows<Exception>{
+            library.rentBook(pickedId, 1)
+        }
     }
 
 
@@ -48,8 +55,9 @@ class LibraryTest {
     fun `the book id is out of bounds for renting`(){
         val pickedId = 100
 
-        library.rentBook(pickedId, 1)
-        assertFalse(library.rentBook(pickedId, 1))
+        assertThrows<Exception>{
+            library.rentBook(pickedId, 1)
+        }
     }
 
 
@@ -59,7 +67,9 @@ class LibraryTest {
         val pickedId = 1
 
         library.rentBook(pickedId, 1)
-        assertTrue { library.returnBook(pickedId) }
+
+        val result = library.returnBook(pickedId)
+        assertEquals(result::class.simpleName, "Rental")
     }
 
 
@@ -68,7 +78,9 @@ class LibraryTest {
         val pickedId = 10
 
         library.rentBook(pickedId, 1)
-        assertTrue { library.returnBook(pickedId) }
+
+        val result = library.returnBook(pickedId)
+        assertEquals(result::class.simpleName, "Rental")
     }
 
 
@@ -82,7 +94,9 @@ class LibraryTest {
         library.returnBook(1)
         library.returnBook(10)
         library.returnBook(11)
-        assertTrue { library.returnBook(8) }
+
+        val result = library.returnBook(8)
+        assertEquals(result::class.simpleName, "Rental")
     }
 
 
@@ -90,8 +104,9 @@ class LibraryTest {
     fun `the book is not rented`(){
         val pickedId = 1
 
-        library.returnBook(pickedId)
-        assertFalse { library.returnBook(pickedId) }
+        assertThrows<Exception>{
+            library.returnBook(pickedId)
+        }
     }
 
 
@@ -100,8 +115,9 @@ class LibraryTest {
     fun `the book id is out of bounds for return`(){
         val pickedId = 100
 
-        library.returnBook(pickedId)
-        assertFalse { library.returnBook(pickedId) }
+        assertThrows<Exception>{
+            library.returnBook(pickedId)
+        }
     }
 
 

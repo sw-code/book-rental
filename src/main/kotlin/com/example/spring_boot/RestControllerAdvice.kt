@@ -17,10 +17,18 @@ class GlobalExceptionHandler {
         return ResponseEntity(problem, HttpStatus.NOT_FOUND)
     }
 
-    @ExceptionHandler(BookNotAvailableException::class)
-    fun handleAlreadyRented(ex: BookNotAvailableException): ResponseEntity<ProblemDetail> {
+    @ExceptionHandler(BookNotAvailableRentException::class)
+    fun handleAlreadyRented(ex: BookNotAvailableRentException): ResponseEntity<ProblemDetail> {
         val problem = ProblemDetail.forStatus(HttpStatus.CONFLICT)
         problem.title = "Book already rented"
+        problem.detail = ex.message
+        return ResponseEntity(problem, HttpStatus.CONFLICT)
+    }
+
+    @ExceptionHandler(BookNotAvailableReturnException::class)
+    fun handleNotYetRented(ex: BookNotAvailableReturnException): ResponseEntity<ProblemDetail> {
+        val problem = ProblemDetail.forStatus(HttpStatus.CONFLICT)
+        problem.title = "Book not yet rented"
         problem.detail = ex.message
         return ResponseEntity(problem, HttpStatus.CONFLICT)
     }
