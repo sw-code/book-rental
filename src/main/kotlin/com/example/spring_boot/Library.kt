@@ -1,82 +1,80 @@
 package com.example.spring_boot
 
-import org.springframework.cglib.core.Local
+import org.springframework.stereotype.Component
 import java.time.LocalDate
 import java.time.temporal.ChronoUnit
 
+@Component
 class Library(
     val books: List<Book>,
     var currentBooks: MutableList<Book>
 ) {
 
-    var rental = mutableListOf<Rental>()
+    var rentedBooks = mutableListOf<Rental>()
 
-    fun rentBook(idInput: Int, user: Int): Boolean{  // returns true if the rental was successful otherwise false
+    fun rentBook(idInput: Int, user: Int): Rental {  // returns true if the rental was successful otherwise false
 
-        if(books.any{ it.id == idInput }){
+        if (books.any { it.id == idInput }) {
 
             val indexOfBook = currentBooks.indexOfFirst { it.id == idInput }
 
-            if(indexOfBook != -1){
+            if (indexOfBook != -1) {
 
-                rental.add(Rental(idInput, user))
-                rental[rental.size - 1].info()
+                rentedBooks.add(Rental(idInput, user))
+
+                val rental = rentedBooks[rentedBooks.size - 1]
+                rental.info()
 
                 currentBooks.removeAt(indexOfBook)
 
-                return true
+                return rental
+            } else {
+                throw BookNotAvailableException(idInput)
             }
-            else{
-                println("book is already rented")
-            }
+        } else {
+            throw BookNotFoundException(idInput)
         }
-        else{
-            println("index out of bounds, the submitted index is out of range of the Available books")
-        }
-        return false
     }
 
 
-    fun returnBook(idInput: Int): Boolean{  // returns true if the rental was successful otherwise false
+    fun returnBook(idInput: Int): Boolean {  // returns true if the rental was successful otherwise false
 
-        if(books.any{ it.id == idInput }){
+        if (books.any { it.id == idInput }) {
 
             val indexOfBook = currentBooks.indexOfFirst { it.id == idInput }
 
-            if(indexOfBook == -1){
+            if (indexOfBook == -1) {
                 val indexOfBook = books.indexOfFirst { it.id == idInput }
 
                 currentBooks.add(books[indexOfBook])
 
-                val indexOfRental = rental.indexOfFirst { it.bookId == idInput }
+                val indexOfRental = rentedBooks.indexOfFirst { it.bookId == idInput }
 
-                rental[indexOfRental].returnedDate = LocalDate.now()
-                reminderFeeCalculation(rental[indexOfRental], rental[indexOfRental].returnedDate!!)
+                rentedBooks[indexOfRental].returnedDate = LocalDate.now()
+                reminderFeeCalculation(rentedBooks[indexOfRental], rentedBooks[indexOfRental].returnedDate!!)
 
-                rental.removeAt(indexOfRental)
+                rentedBooks.removeAt(indexOfRental)
                 return true
 
-            }
-            else{
+            } else {
                 println("book is not rented yet")
             }
-        }
-        else{
+        } else {
             println("index out of bounds, the submitted index is out of range of the Available books")
         }
         return false
     }
 
 
-    fun calculateFeeFromUser(user: Int, date: LocalDate):Int{
+    fun calculateFeeFromUser(user: Int, date: LocalDate): Int {
         var feeFromUser = 0
 
-        val matchingIndices = rental
+        val matchingIndices = rentedBooks
             .mapIndexed { index, rental -> if (rental.userId == user) index else null }
             .filterNotNull()
 
-        for(i in matchingIndices){
-            feeFromUser += reminderFeeCalculation(rental[i], date)
+        for (i in matchingIndices) {
+            feeFromUser += reminderFeeCalculation(rentedBooks[i], date)
         }
 
         println("the total balance user $user has to pay is $feeFromUser")
@@ -84,12 +82,10 @@ class Library(
     }
 
 
-
-
-    private fun reminderFeeCalculation(rentalOrder: Rental, date: LocalDate): Int{
+    private fun reminderFeeCalculation(rentalOrder: Rental, date: LocalDate): Int {
         val daysBetween = ChronoUnit.DAYS.between(rentalOrder.loanDate, date)
 
-        if(daysBetween > 14){
+        if (daysBetween > 14) {
             val reminderFee = (daysBetween - 14).toInt()
 //            println("the book was returned outside of the 14 days time span, for each day above that threshold we will charge 1€")
 //            println("in your case it were $daysBetween which leaves a total of $reminderFee€")

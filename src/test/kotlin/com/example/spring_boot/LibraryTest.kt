@@ -112,14 +112,14 @@ class LibraryTest {
     fun `loan date correctly safed`(){
         library.rentBook(1, 1)
 
-        assertEquals(library.rental[0].loanDate, LocalDate.now())
+        assertEquals(library.rentedBooks[0].loanDate, LocalDate.now())
     }
 
     @Test
     fun `to return date correctly safed`(){
         library.rentBook(1, 1)
 
-        assertEquals(library.rental[0].loanDate.plusDays(14), library.rental[0].toReturnDate)
+        assertEquals(library.rentedBooks[0].loanDate.plusDays(14), library.rentedBooks[0].toReturnDate)
     }
 
 

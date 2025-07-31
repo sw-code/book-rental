@@ -1,13 +1,19 @@
 package com.example.spring_boot
 
+import org.springframework.boot.autoconfigure.SpringBootApplication
+import org.springframework.boot.runApplication
 import java.time.LocalDate
 
 private val books = listOf(Book("Kotlin in action", 1), Book("Jamie Oliver", 10))
 
-private val library = Library(books, books.toMutableList())
+val library = Library(books, books.toMutableList())
+
+@SpringBootApplication
+class Application
 
 fun main(args: Array<String>) {
-	start()
+	runApplication<Application>(*args)
+	// start()
 }
 
 fun start(){
