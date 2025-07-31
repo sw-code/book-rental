@@ -1,5 +1,7 @@
 package com.example.spring_boot
 
+import java.time.LocalDate
+
 private val books = listOf(Book("Kotlin in action", 1), Book("Jamie Oliver", 10))
 
 private val library = Library(books, books.toMutableList())
@@ -19,7 +21,7 @@ fun start(){
 
 	bookInfos()
 
-	library.calculateFeeFromUser(1)
+	library.calculateFeeFromUser(1, LocalDate.now())
 
 	callReturnBook()
 
@@ -29,7 +31,7 @@ fun start(){
 
 	bookInfos()
 
-	library.calculateFeeFromUser(1)
+	library.calculateFeeFromUser(1, LocalDate.now())
 }
 
 

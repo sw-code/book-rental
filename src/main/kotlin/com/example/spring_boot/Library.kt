@@ -68,7 +68,7 @@ class Library(
     }
 
 
-    fun calculateFeeFromUser(user: Int):Int{
+    fun calculateFeeFromUser(user: Int, date: LocalDate):Int{
         var feeFromUser = 0
 
         val matchingIndices = rental
@@ -76,7 +76,7 @@ class Library(
             .filterNotNull()
 
         for(i in matchingIndices){
-            feeFromUser += reminderFeeCalculation(rental[i], LocalDate.now())
+            feeFromUser += reminderFeeCalculation(rental[i], date)
         }
 
         println("the total balance user $user has to pay is $feeFromUser")
@@ -86,8 +86,8 @@ class Library(
 
 
 
-    fun reminderFeeCalculation(rentalOrder: Rental, date: LocalDate): Int{
-        val daysBetween = ChronoUnit.DAYS.between(date, rentalOrder.loanDate)
+    private fun reminderFeeCalculation(rentalOrder: Rental, date: LocalDate): Int{
+        val daysBetween = ChronoUnit.DAYS.between(rentalOrder.loanDate, date)
 
         if(daysBetween > 14){
             val reminderFee = (daysBetween - 14).toInt()
