@@ -10,9 +10,17 @@ import org.springframework.web.bind.annotation.RestControllerAdvice
 class GlobalExceptionHandler {
 
     @ExceptionHandler(BookNotFoundException::class)
-    fun handleNotFound(ex: BookNotFoundException): ResponseEntity<ProblemDetail> {
+    fun handleBookNotFound(ex: BookNotFoundException): ResponseEntity<ProblemDetail> {
         val problem = ProblemDetail.forStatus(HttpStatus.NOT_FOUND)
         problem.title = "Book not found"
+        problem.detail = ex.message
+        return ResponseEntity(problem, HttpStatus.NOT_FOUND)
+    }
+
+    @ExceptionHandler(UserNotFoundException::class)
+    fun handleUserNotFound(ex: UserNotFoundException): ResponseEntity<ProblemDetail> {
+        val problem = ProblemDetail.forStatus(HttpStatus.NOT_FOUND)
+        problem.title = "User not found"
         problem.detail = ex.message
         return ResponseEntity(problem, HttpStatus.NOT_FOUND)
     }
@@ -29,6 +37,14 @@ class GlobalExceptionHandler {
     fun handleNotYetRented(ex: BookNotAvailableReturnException): ResponseEntity<ProblemDetail> {
         val problem = ProblemDetail.forStatus(HttpStatus.CONFLICT)
         problem.title = "Book not yet rented"
+        problem.detail = ex.message
+        return ResponseEntity(problem, HttpStatus.CONFLICT)
+    }
+
+    @ExceptionHandler(UserAlreadyExistsException::class)
+    fun handleUserAlreadyExists(ex: UserAlreadyExistsException): ResponseEntity<ProblemDetail> {
+        val problem = ProblemDetail.forStatus(HttpStatus.CONFLICT)
+        problem.title = "User already exists"
         problem.detail = ex.message
         return ResponseEntity(problem, HttpStatus.CONFLICT)
     }

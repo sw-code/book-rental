@@ -2,9 +2,11 @@ package com.example.spring_boot
 
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.GetMapping
+import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RestController
+import java.time.LocalDate
 
 
 @RestController
@@ -30,14 +32,40 @@ class LibraryController {
     fun rentBook(@RequestBody request: BorrowRequest): ResponseEntity<*> {
         val bookId = request.bookId.toInt()
         val userId = request.userId.toInt()
+
         val rental = library.rentBook(bookId, userId)
         return ResponseEntity.ok(rental)
+    }
+
+    @PostMapping("/test")
+        fun test(): String {
+
+        val userIndex = library.users.indexOfFirst { it.id == 1 }
+
+        if (userIndex != -1) {
+            return library.test(library.users[userIndex])
+        }
+
+        return "user nicht da kollege"
     }
 
     @PostMapping("/library/returnBook")
     fun returnBook(@RequestBody request: BorrowRequest): ResponseEntity<*>{
         val bookId = request.bookId.toInt()
-        val rental = library.returnBook(bookId)
+        val userId = request.userId.toInt()
+        val rental = library.returnBook(bookId, userId)
         return ResponseEntity.ok(rental)
+    }
+
+    @PostMapping("/library/addUser/{id}")
+    fun addUser(@PathVariable id: Long): ResponseEntity<*>{
+        val user = library.addUser(id.toInt())
+        return ResponseEntity.ok(user)
+    }
+
+    @GetMapping("/library/user/{id}/fees")
+    fun displayReminderFee(@PathVariable id: Long): String{
+        val reminderFeeUser = library.calculateFeeFromUser(id.toInt(), LocalDate.now())
+        return "user $id has a reminder fee of $reminderFeeUser"
     }
 }

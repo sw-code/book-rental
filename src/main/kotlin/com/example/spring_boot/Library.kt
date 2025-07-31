@@ -10,60 +10,99 @@ class Library(
     var currentBooks: MutableList<Book>
 ) {
 
+    var users = mutableListOf<User>()
     var rentedBooks = mutableListOf<Rental>()
 
-    fun rentBook(idInput: Int, user: Int): Rental {  // returns true if the rental was successful otherwise false
+    fun addUser(id: Int): User{
+        println("new user")
+        val contains = users.indexOfFirst { it.id == id } != -1
+        if(!contains){
+            users.add(User(id))
+            return users[users.size - 1]
+        }
+        else{
+            throw UserAlreadyExistsException(id)
+        }
+    }
 
-        if (books.any { it.id == idInput }) {
+    fun test(user: User): String{
+        println("test")
+        val tester = "user stuff: "+ (users.indexOfFirst {it == user} != 0)
+        println(tester)
+        return tester
+    }
 
-            val indexOfBook = currentBooks.indexOfFirst { it.id == idInput }
+    fun rentBook(idInput: Int, userId: Int): Rental {  // returns true if the rental was successful otherwise false
+        val indexUser = users.indexOfFirst {it.id == userId}
 
-            if (indexOfBook != -1) {
+        if(indexUser != -1) {
 
-                rentedBooks.add(Rental(idInput, user))
+            if (books.any { it.id == idInput }) {
 
-                val rental = rentedBooks[rentedBooks.size - 1]
-                rental.info()
+                val indexOfBook = currentBooks.indexOfFirst { it.id == idInput }
 
-                currentBooks.removeAt(indexOfBook)
+                if (indexOfBook != -1) {
 
-                return rental
+                    rentedBooks.add(Rental(idInput, userId))
+
+                    val rental = rentedBooks[rentedBooks.size - 1]
+                    rental.info()
+
+                    users[indexUser].rentedBooks.add(books[books.indexOfFirst { it.id == idInput }])
+
+                    currentBooks.removeAt(indexOfBook)
+
+                    return rental
+                } else {
+                    throw BookNotAvailableRentException(idInput)
+                }
             } else {
-                throw BookNotAvailableRentException(idInput)
+                throw BookNotFoundException(idInput)
             }
-        } else {
-            throw BookNotFoundException(idInput)
+        }
+        else{
+            throw UserNotFoundException(userId)
         }
     }
 
 
-    fun returnBook(idInput: Int): Rental {  // returns true if the rental was successful otherwise false
+    fun returnBook(idInput: Int, userId: Int): Rental {  // returns true if the rental was successful otherwise false
 
-        if (books.any { it.id == idInput }) {
+        val indexUser = users.indexOfFirst {it.id == userId}
 
-            val indexOfBook = currentBooks.indexOfFirst { it.id == idInput }
+        if(indexUser != -1) {
 
-            if (indexOfBook == -1) {
-                val indexOfBook = books.indexOfFirst { it.id == idInput }
+            if (books.any { it.id == idInput }) {
 
-                currentBooks.add(books[indexOfBook])
+                val indexOfBook = currentBooks.indexOfFirst { it.id == idInput }
 
-                val indexOfRental = rentedBooks.indexOfFirst { it.bookId == idInput }
+                if (indexOfBook == -1) {
+                    val indexOfBook = books.indexOfFirst { it.id == idInput }
 
-                rentedBooks[indexOfRental].returnedDate = LocalDate.now()
-                reminderFeeCalculation(rentedBooks[indexOfRental], rentedBooks[indexOfRental].returnedDate!!)
+                    currentBooks.add(books[indexOfBook])
 
-                val rental = rentedBooks[indexOfRental]
+                    users[indexUser].rentedBooks.remove(books[indexOfBook])
 
-                rentedBooks.removeAt(indexOfRental)
+                    val indexOfRental = rentedBooks.indexOfFirst { it.bookId == idInput }
 
-                return rental
+                    rentedBooks[indexOfRental].returnedDate = LocalDate.now()
+                    reminderFeeCalculation(rentedBooks[indexOfRental], rentedBooks[indexOfRental].returnedDate!!)
 
+                    val rental = rentedBooks[indexOfRental]
+
+                    rentedBooks.removeAt(indexOfRental)
+
+                    return rental
+
+                } else {
+                    throw BookNotAvailableReturnException(idInput)
+                }
             } else {
-                throw BookNotAvailableReturnException(idInput)
+                throw BookNotFoundException(idInput)
             }
-        } else {
-            throw BookNotFoundException(idInput)
+        }
+        else{
+            throw UserNotFoundException(userId)
         }
     }
 
