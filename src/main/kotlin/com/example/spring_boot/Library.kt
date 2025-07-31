@@ -43,7 +43,7 @@ class Library(
 
                 if (indexOfBook != -1) {
 
-                    rentedBooks.add(Rental(idInput, userId))
+                    rentedBooks.add(Rental(idInput, users[indexUser]))
 
                     val rental = rentedBooks[rentedBooks.size - 1]
                     rental.info()
@@ -107,15 +107,11 @@ class Library(
     }
 
 
-    fun calculateFeeFromUser(user: Int, date: LocalDate): Int {
+    fun calculateFeeFromUser(user: User, date: LocalDate): Int {
         var feeFromUser = 0
 
-        val matchingIndices = rentedBooks
-            .mapIndexed { index, rental -> if (rental.userId == user) index else null }
-            .filterNotNull()
-
-        for (i in matchingIndices) {
-            feeFromUser += reminderFeeCalculation(rentedBooks[i], date)
+        for (i in user.rentedBooks) {
+            feeFromUser += reminderFeeCalculation(rentedBooks[rentedBooks.indexOfFirst { it.bookId == i.id }], date)
         }
 
         println("the total balance user $user has to pay is $feeFromUser")

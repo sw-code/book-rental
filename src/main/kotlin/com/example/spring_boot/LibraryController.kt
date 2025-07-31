@@ -65,7 +65,7 @@ class LibraryController {
 
     @GetMapping("/library/user/{id}/fees")
     fun displayReminderFee(@PathVariable id: Long): String{
-        val reminderFeeUser = library.calculateFeeFromUser(id.toInt(), LocalDate.now())
+        val reminderFeeUser = library.calculateFeeFromUser(library.users[library.users.indexOfFirst { it.id == id.toInt() }], LocalDate.now())
         return "user $id has a reminder fee of $reminderFeeUser"
     }
 }

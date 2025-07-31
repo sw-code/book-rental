@@ -4,7 +4,7 @@ import java.time.LocalDate
 
 class Rental(
     val bookId: Int,
-    val userId: Int,
+    val user: User,
 
     val loanDate: LocalDate = LocalDate.now(),
     var returnedDate: LocalDate? = null,
@@ -12,8 +12,10 @@ class Rental(
 )
 {
     fun info(){
+        val tmp = user.id
+
         println("bookId, $bookId")
-        println("userId, $userId")
+        println("userId, $tmp")
         println("loanDate, $loanDate")
     }
 }
