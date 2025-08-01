@@ -17,6 +17,8 @@ class LibraryTest {
     fun `should rent a book`(){
         val pickedId = 1
 
+        library.addUser(1)
+
         val result = library.rentBook(pickedId, 1)
         assertEquals(result::class.simpleName, "Rental")
     }
@@ -25,12 +27,16 @@ class LibraryTest {
     fun `should rent a book 2`(){
         val pickedId = 10
 
+        library.addUser(1)
+
         val result = library.rentBook(pickedId, 1)
         assertEquals(result::class.simpleName, "Rental")
     }
 
     @Test
     fun `should book the entire book collection`(){
+        library.addUser(1)
+
         library.rentBook(1, 1)
         library.rentBook(10, 1)
         library.rentBook(11, 1)
@@ -42,6 +48,8 @@ class LibraryTest {
     @Test
     fun `the book is already rented`(){
         val pickedId = 1
+
+        library.addUser(1)
 
         library.rentBook(pickedId, 1)
 
@@ -55,6 +63,8 @@ class LibraryTest {
     fun `the book id is out of bounds for renting`(){
         val pickedId = 100
 
+        library.addUser(1)
+
         assertThrows<Exception>{
             library.rentBook(pickedId, 1)
         }
@@ -66,9 +76,11 @@ class LibraryTest {
     fun `should return a book`(){
         val pickedId = 1
 
+        library.addUser(1)
+
         library.rentBook(pickedId, 1)
 
-        val result = library.returnBook(pickedId)
+        val result = library.returnBook(pickedId, 1)
         assertEquals(result::class.simpleName, "Rental")
     }
 
@@ -77,25 +89,29 @@ class LibraryTest {
     fun `should return a book 2`(){
         val pickedId = 10
 
+        library.addUser(1)
+
         library.rentBook(pickedId, 1)
 
-        val result = library.returnBook(pickedId)
+        val result = library.returnBook(pickedId, 1)
         assertEquals(result::class.simpleName, "Rental")
     }
 
 
     @Test
     fun `should return the entire book collection`(){
+        library.addUser(1)
+
         library.rentBook(1, 1)
         library.rentBook(10, 1)
         library.rentBook(11, 1)
         library.rentBook(8, 1)
 
-        library.returnBook(1)
-        library.returnBook(10)
-        library.returnBook(11)
+        library.returnBook(1, 1)
+        library.returnBook(10, 1)
+        library.returnBook(11, 1)
 
-        val result = library.returnBook(8)
+        val result = library.returnBook(8, 1)
         assertEquals(result::class.simpleName, "Rental")
     }
 
@@ -104,8 +120,10 @@ class LibraryTest {
     fun `the book is not rented`(){
         val pickedId = 1
 
+        library.addUser(1)
+
         assertThrows<Exception>{
-            library.returnBook(pickedId)
+            library.returnBook(pickedId, 1)
         }
     }
 
@@ -115,8 +133,10 @@ class LibraryTest {
     fun `the book id is out of bounds for return`(){
         val pickedId = 100
 
+        library.addUser(1)
+
         assertThrows<Exception>{
-            library.returnBook(pickedId)
+            library.returnBook(pickedId, 1)
         }
     }
 
@@ -126,6 +146,8 @@ class LibraryTest {
 
     @Test
     fun `loan date correctly safed`(){
+        library.addUser(1)
+
         library.rentBook(1, 1)
 
         assertEquals(library.rentedBooks[0].loanDate, LocalDate.now())
@@ -133,6 +155,8 @@ class LibraryTest {
 
     @Test
     fun `to return date correctly safed`(){
+        library.addUser(1)
+
         library.rentBook(1, 1)
 
         assertEquals(library.rentedBooks[0].loanDate.plusDays(14), library.rentedBooks[0].toReturnDate)
@@ -141,6 +165,8 @@ class LibraryTest {
 
     @Test
     fun `should not calculate a reminder fee(on time given back)`(){
+        library.addUser(1)
+
         library.rentBook(1, 1)
 
         assertEquals(library.calculateFeeFromUser(1, LocalDate.now()), 0)
@@ -148,11 +174,15 @@ class LibraryTest {
 
     @Test
     fun `should not calculate a reminder fee(no books rented)`(){
+        library.addUser(1)
+
         assertEquals(library.calculateFeeFromUser(1, LocalDate.now()), 0)
     }
 
     @Test
     fun `should calculate a reminder fee`(){
+        library.addUser(1)
+
         library.rentBook(1, 1)
 
         val date = LocalDate.now().plusDays(20)
@@ -163,6 +193,8 @@ class LibraryTest {
 
     @Test
     fun `reminder fee for the hole book collection`(){
+        library.addUser(1)
+
         library.rentBook(1, 1)
         library.rentBook(10, 1)
         library.rentBook(11, 1)

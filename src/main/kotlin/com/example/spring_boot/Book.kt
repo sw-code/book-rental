@@ -6,7 +6,4 @@ data class Book(
 )
 
 {
-    fun getName(): String{
-        return title
-    }
 }

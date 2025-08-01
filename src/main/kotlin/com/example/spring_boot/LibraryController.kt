@@ -37,17 +37,6 @@ class LibraryController {
         return ResponseEntity.ok(rental)
     }
 
-    @PostMapping("/test")
-        fun test(): String {
-
-        val userIndex = library.users.indexOfFirst { it.id == 1 }
-
-        if (userIndex != -1) {
-            return library.test(library.users[userIndex])
-        }
-
-        return "user nicht da kollege"
-    }
 
     @PostMapping("/library/returnBook")
     fun returnBook(@RequestBody request: BorrowRequest): ResponseEntity<*>{
@@ -64,8 +53,8 @@ class LibraryController {
     }
 
     @GetMapping("/library/user/{id}/fees")
-    fun displayReminderFee(@PathVariable id: Long): String{
-        val reminderFeeUser = library.calculateFeeFromUser(library.users[library.users.indexOfFirst { it.id == id.toInt() }], LocalDate.now())
-        return "user $id has a reminder fee of $reminderFeeUser"
+    fun displayReminderFee(@PathVariable id: Long): ResponseEntity<Int>{
+        val reminderFeeUser = library.calculateFeeFromUser(id.toInt(), LocalDate.now())
+        return ResponseEntity.ok(reminderFeeUser)
     }
 }

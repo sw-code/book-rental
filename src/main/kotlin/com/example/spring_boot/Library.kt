@@ -107,14 +107,21 @@ class Library(
     }
 
 
-    fun calculateFeeFromUser(user: User, date: LocalDate): Int {
+    fun calculateFeeFromUser(userId: Int, date: LocalDate): Int {
+
+        val indexUser = users.indexOfFirst {it.id == userId}
+
+        if(indexUser == -1) {
+            throw UserNotFoundException(userId)
+        }
+
         var feeFromUser = 0
 
-        for (i in user.rentedBooks) {
+        for (i in users[indexUser].rentedBooks) {
             feeFromUser += reminderFeeCalculation(rentedBooks[rentedBooks.indexOfFirst { it.bookId == i.id }], date)
         }
 
-        println("the total balance user $user has to pay is $feeFromUser")
+        println("the total balance user $userId has to pay is $feeFromUser")
         return feeFromUser
     }
 
