@@ -57,4 +57,28 @@ class LibraryController {
         val reminderFeeUser = library.calculateFeeFromUser(id.toInt(), LocalDate.now())
         return ResponseEntity.ok(reminderFeeUser)
     }
+
+    @GetMapping("/library/books")
+    fun displayBooks(): ResponseEntity<List<Book>>{
+        return ResponseEntity.ok(library.books)
+    }
+
+    @GetMapping("/library/books/current")
+    fun displayBooksCurrent(): ResponseEntity<List<Book>>{
+        return ResponseEntity.ok(library.currentBooks)
+    }
+
+    @GetMapping("/library/books/currentNot")
+    fun displayBooksCurrentNot(): ResponseEntity<List<Book>>{
+
+        var booksCurrentNot =  mutableListOf<Book>()
+
+        for(i in library.books){
+            if(!library.currentBooks.contains(i)){
+                booksCurrentNot.add(i)
+            }
+        }
+
+        return ResponseEntity.ok(booksCurrentNot)
+    }
 }
