@@ -1,61 +1,143 @@
 package com.example.spring_boot
 
+import org.springframework.stereotype.Component
+import java.time.LocalDate
+import java.time.temporal.ChronoUnit
+
+@Component
 class Library(
     val books: List<Book>,
     var currentBooks: MutableList<Book>
 ) {
 
-    var rental = mutableListOf<Rental>()
+    var users = mutableListOf<User>()
+    var rentedBooks = mutableListOf<Rental>()
 
-    fun rentBook(idInput: Int): Boolean{  // returns true if the rental was successful otherwise false
+    fun addUser(id: Int): User{
+        println("new user")
+        val contains = users.indexOfFirst { it.id == id } != -1
+        if(!contains){
+            users.add(User(id))
+            return users[users.size - 1]
+        }
+        else{
+            throw UserAlreadyExistsException(id)
+        }
+    }
 
-        if(books.any{ it.id == idInput }){
+    fun test(user: User): String{
+        println("test")
+        val tester = "user stuff: "+ (users.indexOfFirst {it == user} != 0)
+        println(tester)
+        return tester
+    }
 
-            val indexOfBook = currentBooks.indexOfFirst { it.id == idInput }
+    fun rentBook(idInput: Int, userId: Int): Rental {  // returns true if the rental was successful otherwise false
+        val indexUser = users.indexOfFirst {it.id == userId}
 
-            if(indexOfBook != -1){
+        if(indexUser != -1) {
 
-                rental.add(Rental(idInput, 1))
-                rental[rental.size - 1].info()
+            if (books.any { it.id == idInput }) {
 
-                currentBooks.removeAt(indexOfBook)
+                val indexOfBook = currentBooks.indexOfFirst { it.id == idInput }
 
-                return true
-            }
-            else{
-                println("book is already rented")
+                if (indexOfBook != -1) {
+
+                    rentedBooks.add(Rental(idInput, users[indexUser]))
+
+                    val rental = rentedBooks[rentedBooks.size - 1]
+                    rental.info()
+
+                    users[indexUser].rentedBooks.add(books[books.indexOfFirst { it.id == idInput }])
+
+                    currentBooks.removeAt(indexOfBook)
+
+                    return rental
+                } else {
+                    throw BookNotAvailableRentException(idInput)
+                }
+            } else {
+                throw BookNotFoundException(idInput)
             }
         }
         else{
-            println("index out of bounds, the submitted index is out of range of the Available books")
+            throw UserNotFoundException(userId)
         }
-        return false
     }
 
-    private fun <T> findBookInList(toCheckList: List<T>, match: (T) -> Boolean): Int {
-        for (i in 0..toCheckList.size - 1) {
-            if (match(toCheckList[i])) {
-                return i
+
+    fun returnBook(idInput: Int, userId: Int): Rental {  // returns true if the rental was successful otherwise false
+
+        val indexUser = users.indexOfFirst {it.id == userId}
+
+        if(indexUser != -1) {
+
+            if (books.any { it.id == idInput }) {
+
+                val indexOfBook = currentBooks.indexOfFirst { it.id == idInput }
+
+                if (indexOfBook == -1) {
+                    val indexOfBook = books.indexOfFirst { it.id == idInput }
+
+                    currentBooks.add(books[indexOfBook])
+
+                    users[indexUser].rentedBooks.remove(books[indexOfBook])
+
+                    val indexOfRental = rentedBooks.indexOfFirst { it.bookId == idInput }
+
+                    rentedBooks[indexOfRental].returnedDate = LocalDate.now()
+                    reminderFeeCalculation(rentedBooks[indexOfRental], rentedBooks[indexOfRental].returnedDate!!)
+
+                    val rental = rentedBooks[indexOfRental]
+
+                    rentedBooks.removeAt(indexOfRental)
+
+                    return rental
+
+                } else {
+                    throw BookNotAvailableReturnException(idInput)
+                }
+            } else {
+                throw BookNotFoundException(idInput)
             }
         }
-        return -1
+        else{
+            throw UserNotFoundException(userId)
+        }
     }
 
 
+    fun calculateFeeFromUser(userId: Int, date: LocalDate): Int {
 
+        val indexUser = users.indexOfFirst {it.id == userId}
 
+        if(indexUser == -1) {
+            throw UserNotFoundException(userId)
+        }
 
-    fun returnBook(bookId: Int):Boolean{
-        val indexOfBook = findBookInList(books) {it.id == bookId}
+        var feeFromUser = 0
 
-        currentBooks.add(books[indexOfBook])
+        for (i in users[indexUser].rentedBooks) {
+            feeFromUser += reminderFeeCalculation(rentedBooks[rentedBooks.indexOfFirst { it.bookId == i.id }], date)
+        }
 
-        val indexOfRental = findBookInList(rental) {it.bookId == bookId}
-
-        rental.removeAt(indexOfRental)
-
-        return true
+        println("the total balance user $userId has to pay is $feeFromUser")
+        return feeFromUser
     }
 
+
+    private fun reminderFeeCalculation(rentalOrder: Rental, date: LocalDate): Int {
+        val daysBetween = ChronoUnit.DAYS.between(rentalOrder.loanDate, date)
+
+        if (daysBetween > 14) {
+            val reminderFee = (daysBetween - 14).toInt()
+//            println("the book was returned outside of the 14 days time span, for each day above that threshold we will charge 1€")
+//            println("in your case it were $daysBetween which leaves a total of $reminderFee€")
+            return reminderFee
+        }
+
+//        println("the book was returned on time, very well")
+        return 0
+    }
 
 }
