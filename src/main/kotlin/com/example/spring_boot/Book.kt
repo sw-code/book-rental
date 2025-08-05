@@ -1,9 +1,11 @@
 package com.example.spring_boot
 
+import jakarta.persistence.Entity
+import jakarta.persistence.Id
+
+@Entity
 data class Book(
     val title: String,
-    val id: Int
+    @Id
+    val id: Int,
 )
-
-{
-}

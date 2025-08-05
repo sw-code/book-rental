@@ -20,27 +20,49 @@ class LibraryControllerTest {
     lateinit var mockMvc: MockMvc
 
     @Autowired
-    lateinit var libraryController: LibraryController
+    lateinit var libraryRepository: LibraryRepository
+
+    @Autowired
+    lateinit var  librarySetUp: LibrarySetUp
+
+    @Autowired
+    lateinit var userRepository: UserRepository
+
+    @Autowired
+    lateinit var rentalRepository: RentalRepository
+
+    @Autowired
+    lateinit var bookRepository: BookRepository
 
     @BeforeEach
     fun setup() {
-        libraryController.librarySet()
+        libraryRepository.deleteAll()
+        rentalRepository.deleteAll()
+        bookRepository.deleteAll()
+        userRepository.deleteAll()
+
+        librarySetUp.librarySet()
+
+
     }
 
     @Test
-    fun `create one user`(){
-        mockMvc.post("/library/addUser/1").andExpect {
+    fun `should add user if not exists`() {
+        mockMvc.post("/library/addUser") {
+            contentType = MediaType.APPLICATION_JSON
+            content = """{ "userId": "1"}"""
+        }.andExpect {
             status { isOk() }
-            jsonPath("$.id") { value(1) }
         }
-
     }
 
     @Test
     fun `post one rental object`() {
-        mockMvc.post("/library/addUser/1").andExpect {
+        mockMvc.post("/library/addUser") {
+            contentType = MediaType.APPLICATION_JSON
+            content = """{ "userId": 2 }"""
+        }.andExpect {
             status { isOk() }
-            jsonPath("$.id") { value(1) }
         }
 
         mockMvc.get("/rentals").andExpect {
@@ -50,7 +72,7 @@ class LibraryControllerTest {
 
         mockMvc.post("/library/rentBook") {
             contentType = MediaType.APPLICATION_JSON
-            content = """{ "bookId": 1, "userId": 1 }"""
+            content = """{ "bookId": 2, "userId": 2 }"""
         }.andExpect {
             status { isOk() }
         }
@@ -64,26 +86,9 @@ class LibraryControllerTest {
 
     @Test
     fun `post return book object`() {
-        mockMvc.post("/library/addUser/1").andExpect {
-            status { isOk() }
-            jsonPath("$.id") { value(1) }
-        }
-
-        mockMvc.get("/rentals").andExpect {
-            status { isOk() }
-            jsonPath("$", hasSize<Int>(0))
-        }
-
-        mockMvc.post("/library/rentBook") {
+        mockMvc.post("/library/addUser") {
             contentType = MediaType.APPLICATION_JSON
-            content = """{ "bookId": 1, "userId": 1 }"""
-        }.andExpect {
-            status { isOk() }
-        }
-
-        mockMvc.post("/library/returnBook") {
-            contentType = MediaType.APPLICATION_JSON
-            content = """{ "bookId": 1, "userId": 1 }"""
+            content = """{ "userId": 3 }"""
         }.andExpect {
             status { isOk() }
         }
@@ -93,38 +98,9 @@ class LibraryControllerTest {
             jsonPath("$", hasSize<Int>(0))
         }
 
-    }
-
-
-    @Test
-    fun `post return book object, one still remaining`() {
-        mockMvc.post("/library/addUser/1").andExpect {
-            status { isOk() }
-            jsonPath("$.id") { value(1) }
-        }
-
-        mockMvc.get("/rentals").andExpect {
-            status { isOk() }
-            jsonPath("$", hasSize<Int>(0))
-        }
-
         mockMvc.post("/library/rentBook") {
             contentType = MediaType.APPLICATION_JSON
-            content = """{ "bookId": 1, "userId": 1 }"""
-        }.andExpect {
-            status { isOk() }
-        }
-
-        mockMvc.post("/library/rentBook") {
-            contentType = MediaType.APPLICATION_JSON
-            content = """{ "bookId": 10, "userId": 1 }"""
-        }.andExpect {
-            status { isOk() }
-        }
-
-        mockMvc.post("/library/returnBook") {
-            contentType = MediaType.APPLICATION_JSON
-            content = """{ "bookId": 1, "userId": 1 }"""
+            content = """{ "bookId": 3, "userId": 3 }"""
         }.andExpect {
             status { isOk() }
         }
@@ -133,30 +109,93 @@ class LibraryControllerTest {
             status { isOk() }
             jsonPath("$", hasSize<Int>(1))
         }
+
+        mockMvc.post("/library/returnBook") {
+            contentType = MediaType.APPLICATION_JSON
+            content = """{ "bookId": 3, "userId": 3 }"""
+        }.andExpect {
+            status { isOk() }
+        }
+
+        mockMvc.get("/rentals").andExpect {
+            status { isOk() }
+            jsonPath("$", hasSize<Int>(1))
+        }
+
+    }
+
+
+    @Test
+    fun `post return book object, one still remaining`() {
+        mockMvc.post("/library/addUser") {
+            contentType = MediaType.APPLICATION_JSON
+            content = """{ "userId": 4 }"""
+        }.andExpect {
+            status { isOk() }
+        }
+
+        mockMvc.get("/rentals").andExpect {
+            status { isOk() }
+            jsonPath("$", hasSize<Int>(0))
+        }
+
+        mockMvc.post("/library/rentBook") {
+            contentType = MediaType.APPLICATION_JSON
+            content = """{ "bookId": 4, "userId": 4 }"""
+        }.andExpect {
+            status { isOk() }
+        }
+
+        mockMvc.get("/rentals").andExpect {
+            status { isOk() }
+            jsonPath("$", hasSize<Int>(1))
+        }
+
+        mockMvc.post("/library/rentBook") {
+            contentType = MediaType.APPLICATION_JSON
+            content = """{ "bookId": 5, "userId": 4 }"""
+        }.andExpect {
+            status { isOk() }
+        }
+
+        mockMvc.post("/library/returnBook") {
+            contentType = MediaType.APPLICATION_JSON
+            content = """{ "bookId": 4, "userId": 4 }"""
+        }.andExpect {
+            status { isOk() }
+        }
+
+        mockMvc.get("/rentals").andExpect {
+            status { isOk() }
+            jsonPath("$", hasSize<Int>(2))
+        }
     }
 
 
     @Test
     fun `reminder fee correctly(reminder fee of 0)`() {
-        mockMvc.post("/library/addUser/1").andExpect {
-            status { isOk() }
-            jsonPath("$.id") { value(1) }
-        }
-
-
-        mockMvc.post("/library/rentBook") {
+        mockMvc.post("/library/addUser") {
             contentType = MediaType.APPLICATION_JSON
-            content = """{ "bookId": 1, "userId": 1 }"""
+            content = """{ "userId": 5 }"""
         }.andExpect {
             status { isOk() }
         }
 
 
-        mockMvc.get("/library/user/1/fees").andExpect {
+        mockMvc.post("/library/rentBook") {
+            contentType = MediaType.APPLICATION_JSON
+            content = """{ "bookId": 6, "userId": 5 }"""
+        }.andExpect {
+            status { isOk() }
+        }
+
+
+        mockMvc.get("/library/user/5/fees").andExpect {
             status { isOk() }
             content { string("0") }
         }
 
+        val test: Int
 
     }
 
@@ -164,7 +203,7 @@ class LibraryControllerTest {
     fun `should return all books`(){
         mockMvc.get("/library/books").andExpect {
             status {  {isOk()}
-            jsonPath("$", hasSize<Int>(2)) }
+                jsonPath("$", hasSize<Int>(10)) }
         }
     }
 
@@ -172,21 +211,23 @@ class LibraryControllerTest {
     fun `should return all books currently available books(2)`(){
         mockMvc.get("/library/books/current").andExpect {
             status {  {isOk()}
-                jsonPath("$", hasSize<Int>(2)) }
+                jsonPath("$", hasSize<Int>(10)) }
         }
     }
 
     @Test
-    fun `should return all books currently available books(0)`(){
+    fun `should return all books currently available books(8)`(){
 
-        mockMvc.post("/library/addUser/1").andExpect {
+        mockMvc.post("/library/addUser") {
+            contentType = MediaType.APPLICATION_JSON
+            content = """{ "userId": 6 }"""
+        }.andExpect {
             status { isOk() }
-            jsonPath("$.id") { value(1) }
         }
 
         mockMvc.post("/library/rentBook") {
             contentType = MediaType.APPLICATION_JSON
-            content = """{ "bookId": 1, "userId": 1 }"""
+            content = """{ "bookId": 7, "userId": 6 }"""
         }.andExpect {
             status { isOk() }
         }
@@ -194,7 +235,7 @@ class LibraryControllerTest {
 
         mockMvc.post("/library/rentBook") {
             contentType = MediaType.APPLICATION_JSON
-            content = """{ "bookId": 10, "userId": 1 }"""
+            content = """{ "bookId": 8, "userId": 6 }"""
         }.andExpect {
             status { isOk() }
         }
@@ -202,7 +243,7 @@ class LibraryControllerTest {
 
         mockMvc.get("/library/books/current").andExpect {
             status {  {isOk()}
-                jsonPath("$", hasSize<Int>(0)) }
+                jsonPath("$", hasSize<Int>(8)) }
         }
     }
 
@@ -218,14 +259,9 @@ class LibraryControllerTest {
     @Test
     fun `should return all books not currently available books(2)`(){
 
-        mockMvc.post("/library/addUser/1").andExpect {
-            status { isOk() }
-            jsonPath("$.id") { value(1) }
-        }
-
-        mockMvc.post("/library/rentBook") {
+        mockMvc.post("/library/addUser") {
             contentType = MediaType.APPLICATION_JSON
-            content = """{ "bookId": 1, "userId": 1 }"""
+            content = """{ "userId": 7 }"""
         }.andExpect {
             status { isOk() }
         }
@@ -233,7 +269,15 @@ class LibraryControllerTest {
 
         mockMvc.post("/library/rentBook") {
             contentType = MediaType.APPLICATION_JSON
-            content = """{ "bookId": 10, "userId": 1 }"""
+            content = """{ "bookId": 9, "userId": 7 }"""
+        }.andExpect {
+            status { isOk() }
+        }
+
+
+        mockMvc.post("/library/rentBook") {
+            contentType = MediaType.APPLICATION_JSON
+            content = """{ "bookId": 10, "userId": 7 }"""
         }.andExpect {
             status { isOk() }
         }

@@ -8,10 +8,10 @@ import kotlin.test.assertTrue
 
 class LibraryTest {
 
-    val books = listOf(Book("Kotlin in action", 1), Book("Jamie Oliver", 10), Book("Die Geschichte des Swaglords", 11),Book("Hausarbeit eines BWL studenten", 8))
+    val books = listOf(Book("Kotlin in action", 1), Book("Swaglord Triology", 2), Book("BWL student life comparison", 3), Book("SQL for beginners", 4), Book("Suicidal, a starter guide", 5), Book("the depressed author", 6), Book("Cooking for people who do not cook Oliver", 7), Book("Psychology of Money", 8), Book("Rich Dad Poor Dad", 9), Book("Jamie Oliver", 10))
     var currentBooks = books.toMutableList()
 
-    val library = Library(books, currentBooks)
+    val library = Library(books = books, currentBooks = currentBooks)
 
     @Test
     fun `should rent a book`(){
@@ -169,14 +169,14 @@ class LibraryTest {
 
         library.rentBook(1, 1)
 
-        assertEquals(library.calculateFeeFromUser(1, LocalDate.now()), 0)
+        assertEquals(library.calculateFeeFromUser(1), 0)
     }
 
     @Test
     fun `should not calculate a reminder fee(no books rented)`(){
         library.addUser(1)
 
-        assertEquals(library.calculateFeeFromUser(1, LocalDate.now()), 0)
+        assertEquals(library.calculateFeeFromUser(1), 0)
     }
 
     @Test
@@ -184,10 +184,9 @@ class LibraryTest {
         library.addUser(1)
 
         library.rentBook(1, 1)
-
         val date = LocalDate.now().plusDays(20)
 
-        assertEquals(library.calculateFeeFromUser(1, date), 6)
+        assertEquals(library.calculateFeeFromUser(1), 6)
     }
 
 
@@ -202,7 +201,7 @@ class LibraryTest {
 
         val date = LocalDate.now().plusDays(20)
 
-        assertEquals(library.calculateFeeFromUser(1, date),24)
+        assertEquals(library.calculateFeeFromUser(1),24)
     }
 
 
